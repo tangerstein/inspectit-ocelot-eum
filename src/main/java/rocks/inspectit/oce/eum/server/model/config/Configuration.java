@@ -14,9 +14,9 @@ import java.util.Map;
 
 /**
  *
- * The configuration of the boomerang server
+ * The configuration of the inspectit-ocelot-eum-server
  */
-@ConfigurationProperties("boomerang-server")
+@ConfigurationProperties("inspectit-ocelot-eum-server")
 @Component
 @Data
 @Validated

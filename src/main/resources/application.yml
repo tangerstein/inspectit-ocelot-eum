@@ -1,4 +1,4 @@
-boomerang-server:
+inspectit-ocelot-eum-server:
   metrics:
     - name: page_ready_time
       measure-type: LONG
@@ -10,7 +10,6 @@ boomerang-server:
     - name: load_time
       measure-type: LONG
       beacon-field: t_done
-
       unit: ms
       aggregations:
         - SUM
@@ -32,7 +31,7 @@ boomerang-server:
       beacon-field: rt.end
       unit: ms
       tag-keys:
-        - SPECIAL_KEY
+        - APPLICATION_NAME
       aggregations:
         - LAST_VALUE
   tags:
@@ -44,8 +43,8 @@ boomerang-server:
       derive-from-beacon: true
       global: true
       value: ua.plt
-    SPECIAL_KEY:
-      value: special-key
+    APPLICATION_NAME:
+      value: my-application
   exporters:
     metrics:
       prometheus:

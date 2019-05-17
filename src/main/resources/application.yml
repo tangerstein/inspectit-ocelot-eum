@@ -1,0 +1,54 @@
+boomerang-server:
+  metrics:
+    - name: page_ready_time
+      measure-type: LONG
+      beacon-field: t_page
+      unit: ms
+      aggregations:
+        - SUM
+        - COUNT
+    - name: load_time
+      measure-type: LONG
+      beacon-field: t_done
+
+      unit: ms
+      aggregations:
+        - SUM
+        - COUNT
+    - name: start_timestamp
+      measure-type: LONG
+      beacon-field: rt.tstart
+      unit: ms
+      aggregations:
+        - LAST_VALUE
+    - name: navigation_start_timestamp
+      measure-type: LONG
+      beacon-field: rt.nstart
+      unit: ms
+      aggregations:
+        - LAST_VALUE
+    - name: end_timestamp
+      measure-type: LONG
+      beacon-field: rt.end
+      unit: ms
+      tag-keys:
+        - SPECIAL_KEY
+      aggregations:
+        - LAST_VALUE
+  tags:
+    URL: 
+      global: true
+      derive-from-beacon: true
+      value: u
+    OS:
+      derive-from-beacon: true
+      global: true
+      value: ua.plt
+    SPECIAL_KEY:
+      value: special-key
+  exporters:
+    metrics:
+      prometheus:
+        enabled: true
+        host: localhost
+        port: 8888

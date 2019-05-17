@@ -1,0 +1,79 @@
+# Java Gradle CircleCI 2.0 configuration file
+#
+# Check https://circleci.com/docs/2.0/language-java/ for more details
+#
+version: 2.1
+
+# ###############################################################
+# Commands
+commands:
+  attach_repo:
+    steps:
+      - attach_workspace:
+          at: ~/inspectit
+  build_and_test:
+    steps:
+      - run: cd repo && ./gradlew assemble
+      - run: cd repo && ./gradlew test
+      - store_test_results:
+          path: ~/inspectit/repo/inspectit-ocelot-eum/build/test-results
+
+# ###############################################################
+# Jobs
+jobs:
+  # Job for checking out the source code to build and test
+  checkout:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/inspectit
+    steps:
+      - checkout:
+          path: ~/inspectit/repo
+      - persist_to_workspace:
+          root: ~/inspectit
+          paths:
+            - repo
+
+  # Testing on OpenJDK 8
+  sys-openjdk8:
+    docker:
+      - image: circleci/openjdk:8-jdk
+    working_directory: ~/inspectit
+    steps:
+      - attach_repo
+      - build_and_test
+
+# ###############################################
+# The defined workflows
+workflows:
+  version: 2
+
+  # Workflow for testing and deploying master documentation
+  build_and_test:
+    jobs:
+      - checkout
+
+      - sys-openjdk8:
+          requires:
+            - checkout
+
+  # Workflow for building and deploying releases based on tagged commits
+  release:
+    jobs:
+      - requesting-release-build:
+          type: approval
+          filters: &filter_release
+            branches:
+              ignore: /.*/
+            tags:
+              only: /\d+\.\d+(\..+)?/
+      - checkout:
+          filters:
+            <<: *filter_release
+          requires:
+            - requesting-release-build
+      - sys-openjdk8:
+          filters:
+            <<: *filter_release
+          requires:
+            - checkout
